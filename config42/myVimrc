@@ -1,0 +1,116 @@
+" | *** SET AUTOLOAD *** |
+set number
+packadd! dracula
+syntax enable
+colorscheme dracula
+filetype plugin indent on
+" show existing tab with 4 spaces width
+set tabstop=4
+" when indenting with '>', use 4 spaces width
+set shiftwidth=4
+" On pressing tab, insert 4 spaces
+set noexpandtab
+set noerrorbells
+set wildmenu
+set showcmd
+set ignorecase
+set smartcase
+set autoindent
+set scrolloff=4
+set history=1000
+set noswapfile
+set mouse=a
+set laststatus=2
+set title
+set t_Co=256
+" ___________________________________________________
+
+" | *** MAPPING *** |
+let mapleader = "-"
+
+noremap ` :Stdheader<CR>
+map <leader>` i#include "libft.h"<CR><CR>
+noremap <space>` iint main(int ac, char **av)<CR>{<CR><tab>return (0);<CR>}<esc>gg=G
+inoremap <space><space> <esc>
+vnoremap <space><space> <esc>
+noremap w :w<CR>
+noremap q :q!<CR>
+
+" Relative number double mapping function
+function! NumberToggle()
+	if(&relativenumber == 1)
+		set norelativenumber
+	else
+		set relativenumber
+	endif
+endfunc
+map <leader>r :call NumberToggle()<CR>
+
+" Transparent background double mapping function
+let t:is_transparent = 0                        
+function! Toggle_transparent_background()                                                       
+  if t:is_transparent == 0                                                                      
+    hi Normal guibg=#111111 ctermbg=black
+	set background=dark
+    let t:is_transparent = 1                                                                   
+  else                                                                                          
+    hi Normal guibg=NONE ctermbg=NONE                                                      
+    let t:is_transparent = 0                                                                    
+  endif                                                                                         
+endfunction                                                                                     
+map <leader>t :call Toggle_transparent_background()<CR> 
+
+" ___________________________________________________
+
+" | *** PLUGINS *** |
+
+call plug#begin()
+
+Plug 'jiangmiao/auto-pairs'
+"Plug 'vim-syntastic/syntastic'
+"Plug 'alexandregv/norminette-vim'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+
+call plug#end()
+
+
+" ___________________________________________________
+
+" | *** SYNTASTIC CONFIG *** |
+
+" Enable norminette-vim (and gcc)
+let g:syntastic_c_checkers = ['norminette', 'gcc']
+let g:syntastic_aggregate_errors = 1
+
+" Set the path to norminette (do no set if using norminette of 42 mac)
+let g:syntastic_c_norminette_exec = 'norminette'
+
+" Support headers (.h)
+let g:c_syntax_for_h = 1
+let g:syntastic_c_include_dirs = ['include', '../include', '../../include', 'libft', '../libft/include', '../../libft/include']
+
+" Pass custom arguments to norminette (this one ignores 42header)
+let g:syntastic_c_norminette_args = '-R CheckTopCommentHeader'
+
+" Check errors when opening a file (disable to speed up startup time)
+let g:syntastic_check_on_open = 1
+
+" Enable error list
+let g:syntastic_always_populate_loc_list = 1
+
+" Automatically open error list
+let g:syntastic_auto_loc_list = 1
+
+" Skip check when closing
+let g:syntastic_check_on_wq = 0
+
+
+
+" ___________________________________________________
+
+" | *** AIRLINE CONFIG *** |
+
+" autocmd vimenter * colorscheme violet
+"let g:airline_powerline_fonts = 1
+let g:airline_theme='violet'
