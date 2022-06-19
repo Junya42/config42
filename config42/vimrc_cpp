@@ -1,0 +1,246 @@
+" **************************************************************************** "
+"                                                                              "
+"                                                         :::      ::::::::    "
+"    .vimrc                                             :+:      :+:    :+:    "
+"                                                     +:+ +:+         +:+      "
+"    By: anremiki <anremiki@student.42.fr>          +#+  +:+       +#+         "
+"                                                 +#+#+#+#+#+   +#+            "
+"    Created: 2021/12/06 23:52:25 by anremiki          #+#    #+#              "
+"    Updated: 2022/06/20 00:13:00 by anremiki         ###   ########.fr        "
+"                                                                              "
+" **************************************************************************** "
+
+" | *** SET AUTOLOAD *** |
+
+set number
+syntax enable
+packadd! dracula
+colorscheme dracula
+filetype plugin indent on
+set tabstop=4
+set shiftwidth=4
+set noexpandtab
+set noerrorbells
+set wildmenu
+set showcmd
+set ignorecase
+set smartcase
+set autoindent
+set scrolloff=4
+set history=1000
+set noswapfile
+set mouse=a
+set laststatus=2
+set title
+set t_Co=256
+autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+let g:go_bin_path = "/home/junya/go/bin"
+
+" ___________________________________________________
+
+" | *** MAPPING *** |
+let mapleader = "-"
+
+noremap ` :Stdheader<CR>
+map <leader>` i#include "libft.h"<CR><CR>
+noremap <space>` iint main(int ac, char **av)<CR>{<CR><tab>return (0);<CR>}<esc>gg=G
+inoremap <space><space> <esc>
+vnoremap <space><space> <esc>
+noremap w :w<CR>
+noremap q :q!<CR>
+noremap <leader>o :NERDTreeToggle<CR>
+noremap <leader>- <C-w>w
+
+" Relative number double mapping function
+function! NumberToggle()
+	if(&relativenumber == 1)
+		set norelativenumber
+	else
+		set relativenumber
+	endif
+endfunc
+map <leader>r :call NumberToggle()<CR>
+
+" Transparent background double mapping function
+let t:is_transparent = 0                      
+function! Toggle_transparent_background()                                                       
+  if t:is_transparent == 0                                                                      
+    hi Normal guibg=#111111 ctermbg=black
+	set background=dark
+    let t:is_transparent = 1                                                                   
+  else                                                                                          
+    hi Normal guibg=NONE ctermbg=NONE                                                      
+    let t:is_transparent = 0                                                                    
+  endif                                                                                         
+endfunction                                                                                     
+map <leader>t :call Toggle_transparent_background()<CR> 
+
+" ___________________________________________________
+
+" | *** PLUGINS *** |
+
+call plug#begin()
+
+Plug 'jiangmiao/auto-pairs'
+Plug 'preservim/nerdtree'
+Plug 'sheerun/vim-polyglot'
+"Plug 'vim-syntastic/syntastic'
+"Plug 'alexandregv/norminette-vim'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'arcticicestudio/nord-vim'
+Plug 'fatih/vim-go'
+
+call plug#end()
+
+"colorscheme nord
+
+" ___________________________________________________
+
+" | *** SYNTASTIC CONFIG *** |
+
+" Enable norminette-vim (and gcc)
+let g:syntastic_c_checkers = ['norminette', 'gcc']
+let g:syntastic_aggregate_errors = 1
+
+" Set the path to norminette (do no set if using norminette of 42 mac)
+let g:syntastic_c_norminette_exec = 'norminette'
+
+" Support headers (.h)
+let g:c_syntax_for_h = 1
+let g:syntastic_c_include_dirs = ['include', '../include', '../../include', 'libft', '../libft/include', '../../libft/include']
+
+" Pass custom arguments to norminette (this one ignores 42header)
+let g:syntastic_c_norminette_args = '-R CheckTopCommentHeader'
+
+" Check errors when opening a file (disable to speed up startup time)
+let g:syntastic_check_on_open = 1
+
+" Enable error list
+let g:syntastic_always_populate_loc_list = 1
+
+" Automatically open error list
+let g:syntastic_auto_loc_list = 1
+
+" Skip check when closing
+let g:syntastic_check_on_wq = 0
+
+
+
+" ___________________________________________________
+
+" | *** AIRLINE CONFIG *** |
+
+" autocmd vimenter * colorscheme violet
+"let g:airline_powerline_fonts = 1
+let g:airline_theme='violet'
+
+" ___________________________________________________
+"
+" | *** PERSONNAL INFO *** |
+
+let g:user42 = 'anremiki'
+let g:mail42 = 'anremiki@student.42.fr'
+
+" ___________________________________________________
+"
+" | *** Cpp Class Script *** |
+
+command! -nargs=1 Class call Class(<f-args>) 
+
+function! Class(ClassName)                                                                                              
+    "================== header file =====================                                                       
+     let header = a:ClassName.".hpp"                                                                                                                                                                                                                                                                                        
+     :vsp %:h/.hpp                                                                                                                                                                                                                             
+     call append(0,"#ifndef ".toupper(a:ClassName)."_HPP")                                                                 
+     call append(1,"# define ".toupper(a:ClassName)."_HPP")                                                           
+     call append(2,"")                                                                                                  
+     call append(3,"class ".a:ClassName )                                                                                
+     call append(4, "{")                                                                                                 
+     call append(5, "   public:")                                                                                        
+     call append(6, "      ".a:ClassName."();")                                                                          
+     call append(7, "      ~".a:ClassName."();")                                                                 
+     call append(8, "   private:")                                                                                       
+     call append(9, "};")                                                                                               
+     call append(10, "")
+     call append(11,"#endif")                                                              
+     :execute 'write' header                                                                                             
+   "================== source file ========================                                                      
+     let src    = a:ClassName.".cpp"
+     :vsp %:h/.cpp
+     call append(0,"#include \"".a:ClassName.".hpp\"")                                                                          
+     call append(1,"")                                                                                                   
+     call append(2, "/*************************************************************/")
+     call append(3, "/*                          CONSTRUCTOR                      */")
+     call append(4, "/*************************************************************/")
+     call append(5,a:ClassName."::".a:ClassName."()")                                                                           
+     call append(6,"{")                                                                                                   
+     call append(7,"}")                                                                                                   
+     call append(8,"")                                                                                                   
+     call append(9, "/*************************************************************/")
+     call append(10, "/*                         DECONSTRUCTOR                     */")
+     call append(11, "/*************************************************************/")
+     call append(12,a:ClassName."::~".a:ClassName."()")                                                                         
+     call append(13,"{")                                                                                                   
+     call append(14,"}")                                                                                                  
+     :execute 'write' src
+endfunction    
+
+" ___________________________________________________
+"
+" | *** Cpp Canonic Class Script *** |
+
+command! -nargs=1 CClass call CClass(<f-args>) 
+
+function! CClass(ClassName)                                                                                              
+    "================== header file =====================                                                       
+     let header = a:ClassName.".hpp"                                                                                                                                                                                                                                                                                        
+     :vsp %:h/.hpp                                                                                                                                                                                                                             
+     call append(0,"#ifndef ".toupper(a:ClassName)."_HPP")                                                                 
+     call append(1,"# define ".toupper(a:ClassName)."_HPP")                                                           
+     call append(2,"")                                                                                                  
+     call append(3,"class ".a:ClassName )                                                                                
+     call append(4, "{")                                                                                                 
+     call append(5, "   public:")                                                                                        
+     call append(6, "      ".a:ClassName."( void );")                                                                          
+     call append(7, "      ~".a:ClassName."( void );")                                                                          
+     call append(8, "      ".a:ClassName."( ".a:ClassName." const & src );")                                                                 
+     call append(9, "      ".a:ClassName. " & operator=( ".a:ClassName." const & src );")                                                                 
+     call append(10, "   private:")                                                                                       
+     call append(11, "};")                                                                                               
+     call append(12, "")                                                                                               
+     call append(13,"#endif")                                                              
+     :execute 'write' header                                                                                             
+   "================== source file ========================                                                      
+     let src    = a:ClassName.".cpp"
+     :vsp %:h/.cpp
+     call append(0,"#include \"".a:ClassName.".hpp\"")                                                                          
+     call append(1,"")                                                                                                   
+     call append(2, "/*************************************************************/")
+     call append(3, "/*                          CONSTRUCTOR                      */")
+     call append(4, "/*************************************************************/")
+     call append(5,a:ClassName."::".a:ClassName."( void )")                                                                           
+     call append(6,"{")                                                                                                   
+     call append(7,"}")                                                                                                   
+     call append(8,"")                                                                                                   
+     call append(9,a:ClassName."::".a:ClassName."( ".a:ClassName." const & src )")                                                                           
+     call append(10,"{")                                                                                                   
+     call append(11, "    *this = src;")
+     call append(12,"}")                                                                                                   
+     call append(13,"")                                                                                                   
+     call append(14, "/*************************************************************/")
+     call append(15, "/*                         DECONSTRUCTOR                     */")
+     call append(16, "/*************************************************************/")
+     call append(17,a:ClassName."::~".a:ClassName."( void )")                                                                         
+     call append(18,"{")                                                                                                   
+     call append(19,"}")                                                                                                  
+     call append(20,"")                                                                                                   
+     call append(21, "/*************************************************************/")
+     call append(22, "/*                      ASSIGNMENT OPERATOR                  */")
+     call append(23, "/*************************************************************/")
+     call append(24,a:ClassName." & ".a:ClassName."::operator=( ".a:ClassName." const & src )")                                                                           
+     call append(25,"{")                                                                                                   
+     call append(26, "    return (*this);")
+     call append(27,"}")                                                                                                  
+     :execute 'write' src
+endfunction    
