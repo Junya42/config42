@@ -1,0 +1,390 @@
+" **************************************************************************** "
+"                                                                              "
+"                                                         :::      ::::::::    "
+"    .vimrc                                             :+:      :+:    :+:    "
+"                                                     +:+ +:+         +:+      "
+"    By: anremiki <anremiki@student.42.fr>          +#+  +:+       +#+         "
+"                                                 +#+#+#+#+#+   +#+            "
+"    Created: 2021/12/06 23:52:25 by anremiki          #+#    #+#              "
+"    Updated: 2022/08/09 09:08:59 by anremiki         ###   ########.fr        "
+"                                                                              "
+" **************************************************************************** "
+
+" | *** SET AUTOLOAD *** |
+
+set number
+syntax enable
+packadd! dracula
+colorscheme dracula
+filetype plugin indent on
+set tabstop=4
+set shiftwidth=4
+set noexpandtab
+set noerrorbells
+set wildmenu
+set showcmd
+set ignorecase
+set smartcase
+set autoindent
+set scrolloff=4
+set history=1000
+set noswapfile
+set mouse=a
+set laststatus=2
+set updatetime=300
+set title
+set t_Co=256
+let NERDTreeShowLineNumbers=1
+autocmd FIleType nerdtree setlocal relativenumber
+autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+let g:go_bin_path = "/home/junya/go/bin"
+
+" ___________________________________________________
+
+" | *** MAPPING *** |
+let mapleader = "-"
+
+noremap ` :Stdheader<CR>
+map <leader>` i#include "libft.h"<CR><CR>
+noremap <space>` iint main(int ac, char **av)<CR>{<CR><tab>return (0);<CR>}<esc>gg=G
+inoremap <space><space> <esc>
+vnoremap <space><space> <esc>
+noremap w :w<CR>
+noremap q :q!<CR>
+noremap <leader>o :NERDTreeToggle<CR>
+noremap <leader>- <C-w>w
+noremap <bar> :N<CR>
+noremap \ :n<CR>
+
+" Relative number double mapping function
+function! NumberToggle()
+	if(&relativenumber == 1)
+		set norelativenumber
+	else
+		set relativenumber
+	endif
+endfunc
+map <leader>r :call NumberToggle()<CR>
+
+" Transparent background double mapping function
+let t:is_transparent = 0                      
+function! Toggle_transparent_background()                                                       
+  if t:is_transparent == 0                                                                      
+    hi Normal guibg=#111111 ctermbg=black
+	set background=dark
+    let t:is_transparent = 1                                                                   
+  else                                                                                          
+    hi Normal guibg=NONE ctermbg=NONE                                                      
+    let t:is_transparent = 0                                                                    
+  endif                                                                                         
+endfunction                                                                                     
+map <leader>t :call Toggle_transparent_background()<CR> 
+
+" ___________________________________________________
+
+" | *** PLUGINS *** |
+
+call plug#begin()
+
+Plug 'jiangmiao/auto-pairs'
+Plug 'preservim/nerdtree'
+Plug 'sheerun/vim-polyglot'
+"Plug 'vim-syntastic/syntastic'
+"Plug 'alexandregv/norminette-vim'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}"
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'arcticicestudio/nord-vim'
+Plug 'fatih/vim-go'
+
+call plug#end()
+
+"colorscheme nord
+
+" ___________________________________________________
+
+" | *** SYNTASTIC CONFIG *** |
+
+" Enable norminette-vim (and gcc)
+let g:syntastic_c_checkers = ['norminette', 'gcc']
+let g:syntastic_aggregate_errors = 1
+
+" Set the path to norminette (do no set if using norminette of 42 mac)
+let g:syntastic_c_norminette_exec = 'norminette'
+
+" Support headers (.h)
+let g:c_syntax_for_h = 1
+let g:syntastic_c_include_dirs = ['include', '../include', '../../include', 'libft', '../libft/include', '../../libft/include']
+
+" Pass custom arguments to norminette (this one ignores 42header)
+let g:syntastic_c_norminette_args = '-R CheckTopCommentHeader'
+
+" Check errors when opening a file (disable to speed up startup time)
+let g:syntastic_check_on_open = 1
+
+" Enable error list
+let g:syntastic_always_populate_loc_list = 1
+
+" Automatically open error list
+let g:syntastic_auto_loc_list = 1
+
+" Skip check when closing
+let g:syntastic_check_on_wq = 0
+
+
+
+" ___________________________________________________
+
+" | *** AIRLINE CONFIG *** |
+
+" autocmd vimenter * colorscheme violet
+"let g:airline_powerline_fonts = 1
+let g:airline_theme='violet'
+
+" ___________________________________________________
+"
+" | *** PERSONNAL INFO *** |
+
+let g:user42 = 'anremiki'
+let g:mail42 = 'anremiki@student.42.fr'
+
+" ___________________________________________________
+"
+" | *** Cpp Class Script *** |
+
+command! -nargs=1 Class call Class(<f-args>) 
+
+function! Class(ClassName)                                                                                              
+    "================== header file =====================                                                       
+     let header = a:ClassName.".hpp"                                                                                                                                                                                                                                                                                        
+     :vsp %:h/.hpp                                                                                                                                                                                                                             
+     call append(0,"#ifndef ".toupper(a:ClassName)."_HPP")                                                                 
+     call append(1,"# define ".toupper(a:ClassName)."_HPP")                                                           
+     call append(2,"")                                                                                                  
+     call append(3,"class ".a:ClassName )                                                                                
+     call append(4, "{")                                                                                                 
+     call append(5, "   public:")                                                                                        
+     call append(6, "      ".a:ClassName."();")                                                                          
+     call append(7, "      ~".a:ClassName."();")                                                                 
+     call append(8, "   private:")                                                                                       
+     call append(9, "   protected:")                                                                                       
+     call append(10, "};")                                                                                               
+     call append(11, "")
+     call append(12,"#endif")                                                              
+     :execute 'write' header                                                                                             
+   "================== source file ========================                                                      
+     let src    = a:ClassName.".cpp"
+     :vsp %:h/.cpp
+     call append(0,"#include \"".a:ClassName.".hpp\"")                                                                          
+     call append(1,"")                                                                                                   
+     call append(2, "/*************************************************************/")
+     call append(3, "/*                          CONSTRUCTOR                      */")
+     call append(4, "/*************************************************************/")
+     call append(5,a:ClassName."::".a:ClassName."()")                                                                           
+     call append(6,"{")                                                                                                   
+     call append(7,"}")                                                                                                   
+     call append(8,"")                                                                                                   
+     call append(9, "/*************************************************************/")
+     call append(10, "/*                         DESTRUCTOR                        */")
+     call append(11, "/*************************************************************/")
+     call append(12,a:ClassName."::~".a:ClassName."()")                                                                         
+     call append(13,"{")                                                                                                   
+     call append(14,"}")                                                                                                  
+     :execute 'write' src
+endfunction    
+
+" ___________________________________________________
+"
+" | *** Cpp Canonic Class Script *** |
+
+command! -nargs=1 CClass call CClass(<f-args>) 
+
+function! CClass(ClassName)                                                                                              
+    "================== header file =====================                                                       
+     let header = a:ClassName.".hpp"                                                                                                                                                                                                                                                                                        
+     :vsp %:h/.hpp                                                                                                                                                                                                                             
+     call append(0,"#ifndef ".toupper(a:ClassName)."_HPP")                                                                 
+     call append(1,"# define ".toupper(a:ClassName)."_HPP")                                                           
+     call append(2,"")                                                                                                  
+     call append(3,"class ".a:ClassName )                                                                                
+     call append(4, "{")                                                                                                 
+     call append(5, "   public:")                                                                                        
+     call append(6, "      ".a:ClassName."( void );")                                                                          
+     call append(7, "      ~".a:ClassName."( void );")                                                                          
+     call append(8, "      ".a:ClassName."( ".a:ClassName." const & src );")                                                                 
+     call append(9, "      ".a:ClassName. " & operator=( ".a:ClassName." const & src );")                                                                 
+     call append(10, "   private:")                                                                                       
+     call append(11, "   protected:")                                                                                       
+     call append(12, "};")                                                                                               
+     call append(13, "")                                                                                               
+     call append(14,"#endif")                                                              
+     :execute 'write' header                                                                                             
+   "================== source file ========================                                                      
+     let src    = a:ClassName.".cpp"
+     :vsp %:h/.cpp
+     call append(0,"#include \"".a:ClassName.".hpp\"")                                                                          
+     call append(1,"")                                                                                                   
+     call append(2, "/*************************************************************/")
+     call append(3, "/*                          CONSTRUCTOR                      */")
+     call append(4, "/*************************************************************/")
+     call append(5,a:ClassName."::".a:ClassName."( void )")                                                                           
+     call append(6,"{")                                                                                                   
+     call append(7,"}")                                                                                                   
+     call append(8,"")                                                                                                   
+     call append(9,a:ClassName."::".a:ClassName."( ".a:ClassName." const & src )")                                                                           
+     call append(10,"{")                                                                                                   
+     call append(11, "    *this = src;")
+     call append(12,"}")                                                                                                   
+     call append(13,"")                                                                                                   
+     call append(14, "/*************************************************************/")
+     call append(15, "/*                         DESTRUCTOR                        */")
+     call append(16, "/*************************************************************/")
+     call append(17,a:ClassName."::~".a:ClassName."( void )")                                                                         
+     call append(18,"{")                                                                                                   
+     call append(19,"}")                                                                                                  
+     call append(20,"")                                                                                                   
+     call append(21, "/*************************************************************/")
+     call append(22, "/*                      ASSIGNMENT OPERATOR                  */")
+     call append(23, "/*************************************************************/")
+     call append(24,a:ClassName." & ".a:ClassName."::operator=( ".a:ClassName." const & src )")                                                                           
+     call append(25,"{")                                                                                                   
+     call append(26, "    return (*this);")
+     call append(27,"}")                                                                                                  
+     :execute 'write' src
+endfunction    
+
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config.
+inoremap <silent><expr> <leader><TAB>
+      \ coc#pum#visible() ? coc#pum#next(1):
+      \ CheckBackspace() ? "\<Tab>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+
+" Make <CR> to accept selected completion item or notify coc.nvim to format
+" <C-g>u breaks current undo, please make your own choice.
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
+                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+function! CheckBackspace() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Use <c-space> to trigger completion.
+if has('nvim')
+  inoremap <silent><expr> <c-space> coc#refresh()
+else
+  inoremap <silent><expr> <c-@> coc#refresh()
+endif
+
+" Use `[g` and `]g` to navigate diagnostics
+" Use `:CocDiagnostics` to get all diagnostics of current buffer in location list.
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+
+" GoTo code navigation.
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Use K to show documentation in preview window.
+nnoremap <silent> K :call ShowDocumentation()<CR>
+
+function! ShowDocumentation()
+  if CocAction('hasProvider', 'hover')
+    call CocActionAsync('doHover')
+  else
+    call feedkeys('K', 'in')
+  endif
+endfunction
+
+" Highlight the symbol and its references when holding the cursor.
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" Symbol renaming.
+nmap <leader>rn <Plug>(coc-rename)
+
+" Formatting selected code.
+xmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
+
+augroup mygroup
+  autocmd!
+  " Setup formatexpr specified filetype(s).
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  " Update signature help on jump placeholder.
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
+
+" Applying codeAction to the selected region.
+" Example: `<leader>aap` for current paragraph
+xmap <leader>a  <Plug>(coc-codeaction-selected)
+nmap <leader>a  <Plug>(coc-codeaction-selected)
+
+" Remap keys for applying codeAction to the current buffer.
+nmap <leader>ac  <Plug>(coc-codeaction)
+" Apply AutoFix to problem on the current line.
+nmap <leader>qf  <Plug>(coc-fix-current)
+
+" Run the Code Lens action on the current line.
+nmap <leader>cl  <Plug>(coc-codelens-action)
+
+" Map function and class text objects
+" NOTE: Requires 'textDocument.documentSymbol' support from the language server.
+xmap if <Plug>(coc-funcobj-i)
+omap if <Plug>(coc-funcobj-i)
+xmap af <Plug>(coc-funcobj-a)
+omap af <Plug>(coc-funcobj-a)
+xmap ic <Plug>(coc-classobj-i)
+omap ic <Plug>(coc-classobj-i)
+xmap ac <Plug>(coc-classobj-a)
+omap ac <Plug>(coc-classobj-a)
+
+" Remap <C-f> and <C-b> for scroll float windows/popups.
+if has('nvim-0.4.0') || has('patch-8.2.0750')
+  nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+  nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+  inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
+  inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
+  vnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+  vnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+endif
+
+" Use CTRL-S for selections ranges.
+" Requires 'textDocument/selectionRange' support of language server.
+nmap <silent> <C-s> <Plug>(coc-range-select)
+xmap <silent> <C-s> <Plug>(coc-range-select)
+
+" Add `:Format` command to format current buffer.
+command! -nargs=0 Format :call CocActionAsync('format')
+
+" Add `:Fold` command to fold current buffer.
+command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+
+" Add `:OR` command for organize imports of the current buffer.
+command! -nargs=0 OR   :call     CocActionAsync('runCommand', 'editor.action.organizeImport')
+
+" Add (Neo)Vim's native statusline support.
+" NOTE: Please see `:h coc-status` for integrations with external plugins that
+" provide custom statusline: lightline.vim, vim-airline.
+set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+
+" Mappings for CoCList
+" Show all diagnostics.
+nnoremap <silent><nowait> <space>a  :<C-u>CocList diagnostics<cr>
+" Manage extensions.
+nnoremap <silent><nowait> <space>e  :<C-u>CocList extensions<cr>
+" Show commands.
+nnoremap <silent><nowait> <space>c  :<C-u>CocList commands<cr>
+" Find symbol of current document.
+nnoremap <silent><nowait> <space>o  :<C-u>CocList outline<cr>
+" Search workspace symbols.
+nnoremap <silent><nowait> <space>s  :<C-u>CocList -I symbols<cr>
+" Do default action for next item.
+nnoremap <silent><nowait> <space>j  :<C-u>CocNext<CR>
+" Do default action for previous item.
+nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
+" Resume latest coc list.
+nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
